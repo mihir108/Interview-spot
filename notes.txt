@@ -1,0 +1,5 @@
+For encoding and decoding code and input file use:-  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURI
+
+For Muting own audio and video:- https://stackoverflow.com/a/21510029
+
+Try this for socket:- https://stackoverflow.com/a/8364947
