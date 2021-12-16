@@ -68,7 +68,16 @@ io.on("connection", (socket) => {
         console.log(to);
         io.to(to).emit('get-signal', {from,data});
     })
-
+    
+    socket.on("lang-change", msg => {
+        let {newLang, roomId} = msg;
+        socket.broadcast.to(roomId).emit('lang-change', newLang);
+        
+    })
+    
+    socket.on("compile-code", roomId => {
+        socket.broadcast.to(roomId).emit('compile-code', {});
+    })
     
     
 });

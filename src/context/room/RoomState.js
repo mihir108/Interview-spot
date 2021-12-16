@@ -53,12 +53,15 @@ const RoomState = (props) => {
             addVideo(myID, stream);
             myStream.current = stream;
             sendConnectionToAlreadyPresentPeer(stream);
-
             socket.on('new-user-joined', userId => {
                 console.log(userId, 'new joining');
                 receiveConnectionFromNewPeerJoining(stream, userId);
             })
-        });
+        })
+        .catch((err) => {
+            //  User did'nt gave cam/mic access. Do something to show a black screen box.
+            console.log(err);
+        })
         
     }
 
@@ -69,20 +72,17 @@ const RoomState = (props) => {
         if(userId === myID) userVideo.muted = true;
         userVideo.srcObject = UserStream;
         console.log(userId, 'b');
-
-        const run = async() => {
+        
+        userVideo.addEventListener("loadedmetadata", async ()=>{
             console.log('playing');
             await userVideo.play();
             users.current.set(userId,{userVideo});
             showVideos();
-        }
-        userVideo.addEventListener("loadedmetadata", run);
-        if(userVideo.readyState >= 2){
-            run();
-        }
+
+        });
+        
     }
     
-
 
     const receiveConnectionFromNewPeerJoining = (stream, userId) => {
         const peer = new Peer({ initiator: false, trickle: false, stream });
@@ -134,6 +134,7 @@ const RoomState = (props) => {
 
     }
     const toggleVideo= ()=>{
+        //  We can also use getVideoTracks()[0].enabled to check if a remote stream's video is on or not
         myStream.current.getVideoTracks()[0].enabled =
          !(myStream.current.getVideoTracks()[0].enabled);
     }

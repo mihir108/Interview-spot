@@ -3,3 +3,95 @@ For encoding and decoding code and input file use:-  https://developer.mozilla.o
 For Muting own audio and video:- https://stackoverflow.com/a/21510029
 
 Try this for socket:- https://stackoverflow.com/a/8364947
+
+
+{
+    "source_code": "I2luY2x1ZGUgPGJpdHMvc3RkYysrLmg+CnVzaW5nIG5hbWVzcGFjZSBzdGQ7\nCmludCBtYWluKCl7CiAgIGNvdXQ8PCJzb211IjsKICAgcmV0dXJuIDA7Cn0=\n",
+    "language_id": 52,
+    "stdin": "MQ==\n",
+    "expected_output": null,
+    "stdout": "c29tdQ==\n",
+    "status_id": 3,
+    "created_at": "2021-12-16T11:29:48.859Z",
+    "finished_at": "2021-12-16T11:32:49.054Z",
+    "time": "0.003",
+    "memory": 864,
+    "stderr": null,
+    "token": "be546334-54fc-49bf-8eb6-89c6b9437ebf",
+    "number_of_runs": 1,
+    "cpu_time_limit": "5.0",
+    "cpu_extra_time": "1.0",
+    "wall_time_limit": "10.0",
+    "memory_limit": 128000,
+    "stack_limit": 64000,
+    "max_processes_and_or_threads": 60,
+    "enable_per_process_and_thread_time_limit": false,
+    "enable_per_process_and_thread_memory_limit": false,
+    "max_file_size": 1024,
+    "compile_output": null,
+    "exit_code": 0,
+    "exit_signal": null,
+    "message": null,
+    "wall_time": "0.024",
+    "compiler_options": null,
+    "command_line_arguments": null,
+    "redirect_stderr_to_stdout": false,
+    "callback_url": null,
+    "additional_files": null,
+    "enable_network": false,
+    "status": {
+        "id": 3,
+        "description": "Accepted"
+    },
+    "language": {
+        "id": 52,
+        "name": "C++ (GCC 7.4.0)"
+    }
+}
+
+
+
+
+{
+    "source_code": "I2luY2x1ZGUgPGJpdHMvc3RkYysrLmg+CnVzaW5nIG5hbWVzcGFjZSBzdGQ7\nCmludCBtYWluKCl7CiAgIAogICBjaW4+Pmk7CiAgIGNvdXQ8PGk7CiAgIHJl\ndHVybiAwOwp9\n",
+    "language_id": 52,
+    "stdin": "MTIz\n",
+    "expected_output": null,
+    "stdout": null,
+    "status_id": 6,
+    "created_at": "2021-12-16T11:43:10.102Z",
+    "finished_at": "2021-12-16T11:43:12.407Z",
+    "time": null,
+    "memory": null,
+    "stderr": null,
+    "token": "6e1791d6-d84a-4b2a-adfa-f4d10146fee6",
+    "number_of_runs": 1,
+    "cpu_time_limit": "5.0",
+    "cpu_extra_time": "1.0",
+    "wall_time_limit": "10.0",
+    "memory_limit": 128000,
+    "stack_limit": 64000,
+    "max_processes_and_or_threads": 60,
+    "enable_per_process_and_thread_time_limit": false,
+    "enable_per_process_and_thread_memory_limit": false,
+    "max_file_size": 1024,
+    "compile_output": "bWFpbi5jcHA6IEluIGZ1bmN0aW9uIOKAmGludCBtYWluKCnigJk6Cm1haW4u\nY3BwOjU6OTogZXJyb3I6IOKAmGnigJkgd2FzIG5vdCBkZWNsYXJlZCBpbiB0\naGlzIHNjb3BlCiAgICBjaW4+Pmk7CiAgICAgICAgIF4K\n",
+    "exit_code": null,
+    "exit_signal": null,
+    "message": null,
+    "wall_time": null,
+    "compiler_options": null,
+    "command_line_arguments": null,
+    "redirect_stderr_to_stdout": false,
+    "callback_url": null,
+    "additional_files": null,
+    "enable_network": false,
+    "status": {
+        "id": 6,
+        "description": "Compilation Error"
+    },
+    "language": {
+        "id": 52,
+        "name": "C++ (GCC 7.4.0)"
+    }
+}
