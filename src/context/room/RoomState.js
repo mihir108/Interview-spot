@@ -52,7 +52,12 @@ const RoomState = (props) => {
         .then((stream) => {
             addVideo(myID, stream);
             myStream.current = stream;
-            sendConnectionToAlreadyPresentPeer(stream);
+            if(connectedUsers.current){
+                connectedUsers.current.forEach(connectedId => {
+                    sendConnectionToAlreadyPresentPeer(connectedId, stream);
+                })
+            }
+            
             socket.on('new-user-joined', userId => {
                 console.log(userId, 'new joining');
                 receiveConnectionFromNewPeerJoining(stream, userId);
@@ -86,6 +91,8 @@ const RoomState = (props) => {
 
     const receiveConnectionFromNewPeerJoining = (stream, userId) => {
         const peer = new Peer({ initiator: false, trickle: false, stream });
+        let destroyed = false;
+
         peer.on('signal', (data) => {
             console.log(userId, 'initialising')
             socket.emit('init-signal', {to:userId, from:myID, data});
@@ -94,43 +101,71 @@ const RoomState = (props) => {
             console.log(userId,otherStream);
             addVideo(userId, otherStream);
         })
+        peer.on('close', ()=>{
+            // check if the socket is still connected
+            if(users.current.has(userId)){
+                // delete previous peer and it's related stream
+                users.current.delete(userId);
+                showVideos();
+                peer.destroy();
+                destroyed = true;
+                // start new connection again
+                receiveConnectionFromNewPeerJoining(stream, userId);
+            }
+        })
+        peer.on('error', (err) => {
+            // Although it is useless, we still have to use this otherwise peer.on'close' is not getting triggered 
+            console.log(err);
+        })
         
         socket.on('get-signal', (msg)=> {
             let {from, data} = msg;
             if(userId === from){
-                console.log(userId, 'signal');
-                peer.signal(data);
+                console.log(userId, 'signal', destroyed);
+                if(!destroyed) peer.signal(data);
             }
         })
+        
         
     }
     
     
-    const sendConnectionToAlreadyPresentPeer = (stream) => {
-        if(connectedUsers.current){
-            connectedUsers.current.forEach(connectedId => {
-                console.log(connectedUsers.current);
-                const peer = new Peer({ initiator: true, trickle: false, stream });
-                
-                peer.on('signal', (data) => {
-                    // console.log(connectedId,Date.now(),  'init');
-                    socket.emit('init-signal', {to:connectedId ,from:myID, data});
-                });
-                peer.on('stream', (otherStream) => {
-                    console.log(connectedId,Date.now(),  'stream');
-                    addVideo(connectedId, otherStream);
-                })
-                
-                socket.on('get-signal', (msg)=> {
-                    let {from, data} = msg;
-                    if(connectedId === from){
-                        console.log(connectedId,Date.now(), 'signal');
-                        peer.signal(data);
-                    }
-                })
-                
-            });
-        }
+    const sendConnectionToAlreadyPresentPeer = (connectedId, stream) => {
+        const peer = new Peer({ initiator: true, trickle: false, stream });
+        let destroyed = false;
+        
+        peer.on('signal', (data) => {
+            console.log(peer);
+            socket.emit('init-signal', {to:connectedId ,from:myID, data});
+        });
+        peer.on('stream', (otherStream) => {
+            console.log(connectedId,Date.now(),  'stream');
+            addVideo(connectedId, otherStream);
+        })
+        peer.on('close', ()=>{
+            // check if the socket is still connected
+            if(users.current.has(connectedId)){
+                // delete previous peer and it's related stream
+                users.current.delete(connectedId);
+                showVideos();
+                peer.destroy();
+                destroyed = true;
+                // start new connection again
+                sendConnectionToAlreadyPresentPeer(connectedId, stream);
+            }
+        })
+        peer.on('error', (err) => {
+            // Although it is useless, we still have to use this otherwise peer.on'close' is not getting triggered 
+            console.log(err);
+        })
+        
+        socket.on('get-signal', (msg)=> {
+            let {from, data} = msg;
+            if(connectedId === from){
+                console.log(connectedId,Date.now(), 'signal',destroyed);
+                if(!destroyed) peer.signal(data);
+            }
+        })
 
     }
     const toggleVideo= ()=>{

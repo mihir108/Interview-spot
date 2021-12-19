@@ -1,5 +1,9 @@
 import axios from "axios";
-const API_KEY = '73bfff05e8mshdafc167b1f0cbd0p1f5d74jsn2debc0231dda'
+// const API_KEY = '73bfff05e8mshdafc167b1f0cbd0p1f5d74jsn2debc0231dda'
+// const API_KEY = '642a5d1a7fmshfc133c9d3876cc3p14c362jsn159bad2f1041'
+// const API_KEY = '81351fd847msh51e7b8d7c9f13efp1cc954jsn4cce49d4dd1e'
+const API_KEY = '7618912dbfmsh2a325e3decd2d07p1f9956jsn62222c2ff5fd'
+
 
 function encode(str) {
   return btoa(unescape(encodeURIComponent(str || "")));
@@ -13,15 +17,16 @@ function decode(bytes) {
 	}
 }
 
-function showOutput(data, setOutput) {
+function showOutput(data, onOutputChange) {
 	let result;
 	if(data.status.description === "Compilation Error") result = data.compile_output;
 	else if(data.status.description === "Accepted") result = data.stdout;
 	else if(data.status.description === 'Runtime Error (NZEC)') result = data.stderr;
-	setOutput(decode(result));
+
+	onOutputChange(decode(result));  //  You have to manually tell others that your output file changed programmatically.
 }
 
-function checkIfCodeCompiled(token, setOuput) {
+function checkIfCodeCompiled(token, onOutputChange) {
 	const options = {
 	method: 'GET',
 	url: `https://judge0-ce.p.rapidapi.com/submissions/${token}`,
@@ -31,17 +36,17 @@ function checkIfCodeCompiled(token, setOuput) {
 		'x-rapidapi-key': `${API_KEY}`
 	}
 	};
-
+	console.log('asking');
 	axios.request(options).then(function (response) {
-		showOutput(response.data, setOuput);
+		showOutput(response.data, onOutputChange);
 
 	}).catch(function (error) {
 		console.error(error);
 	});
 }
 
-export function compile(code, input,lang, setOutput) {
-	setOutput('Compiling your code...');
+export function compile(code, input,lang, onOutputChange) {
+	onOutputChange('Compiling your code...');
 	const options = {
 	method: 'POST',
 	url: 'https://judge0-ce.p.rapidapi.com/submissions',
@@ -58,9 +63,10 @@ export function compile(code, input,lang, setOutput) {
 	}
 	};
 
+	console.log('compiling');
 	axios.request(options).then(function (response) {
 		const token = response.data.token;
-		checkIfCodeCompiled(token, setOutput);
+		checkIfCodeCompiled(token, onOutputChange);
 
 	}).catch(function (error) {
 		console.error(error);

@@ -75,10 +75,6 @@ io.on("connection", (socket) => {
         
     })
     
-    socket.on("compile-code", roomId => {
-        socket.broadcast.to(roomId).emit('compile-code', {});
-    })
-    
     
 });
 

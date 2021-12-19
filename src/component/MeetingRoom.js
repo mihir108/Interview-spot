@@ -1,8 +1,10 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import roomContext from '../context/room/RoomContext';
 import { useNavigate } from "react-router-dom";
 import Video from './Video'
 import { compile } from '../functions/compile';
+import CodeEditor from './CodeEditor';
+import Editor from "@monaco-editor/react";
 
 const Meeting = () => {
     const context = useContext(roomContext);
@@ -12,33 +14,32 @@ const Meeting = () => {
     const [output, setOutput] = useState('')
     const [lang, setLang] = useState(54)
     const [currLang, setCurrLang] = useState('C++')
-    let navigate = useNavigate();
+    useEffect(() => {
+        // This is very necessary. If we do without useEffect then multiple listeners for a single socket message will be registered. For ex:- socket.on("input-file-change") will run multiple times. Inside useEffect the socket listeners will be created once only.
+        socket.on("input-file-change", (text) => {
+            setInput(text);
+        });
+        socket.on("output-file-change", (text) => {
+            setOutput(text);
+        });
+        socket.on('lang-change', (newLang) => {
+            changeLang(newLang);
+        })
+        
+    },[])
 
-    socket.on("code-file-change", (text) => {
-        setCode(text);
-    });
-    socket.on("input-file-change", (text) => {
-        setInput(text);
-    });
-    socket.on("output-file-change", (text) => {
-        setOutput(text);
-    });
-    socket.on('lang-change', (newLang) => {
-        changeLang(newLang);
-    })
-    socket.on('compile-code', () => {
-        compile(code, input,lang, setOutput);
-    })
-
-    const onchange = (e) => {
-        if (e.target.id === 'code-file') setCode(e.target.value);
-        else if (e.target.id === 'input-file') setInput(e.target.value);
-        else setOutput(e.target.value);
-
-        let msgName = `${e.target.id}-change`;
-        let msg = { text: e.target.value, roomId };
+    
+    const onInputChange = (e) => {
+        setInput(e);
+        let msgName = `input-file-change`;
+        let msg = { text: e, roomId };
         socket.emit(msgName, msg);
-
+    }
+    const onOutputChange = (e) => {
+        setOutput(e);
+        let msgName = `output-file-change`;
+        let msg = { text: e, roomId };
+        socket.emit(msgName, msg);
     }
 
     const changeLang = (newLang)=>{
@@ -47,6 +48,7 @@ const Meeting = () => {
         else if(newLang === '54') setCurrLang('C++');
         else if(newLang === '51') setCurrLang('C#');
         else if(newLang === '62') setCurrLang('Java');
+        else if(newLang === '63') setCurrLang('JavaScript');
         else setCurrLang('Python');
     }
     const onclick = (e) => {
@@ -56,15 +58,30 @@ const Meeting = () => {
 
     return (
         <>
-            {
+            {/* {
                 !localStorage.getItem('roomId') && navigate('/home')
-            }
+            } */}
 
             <h2>Code Area</h2>
             <div className="form-group" style={{ display: 'inline-flex' }}>
-                <textarea className="form-control p-3" id="code-file" rows="10" onChange={onchange} value={code}></textarea>
-                <textarea className="form-control p-3" id="input-file" rows="10" onChange={onchange} value={input}></textarea>
-                <textarea className="form-control p-3" id="output-file" rows="10" onChange={onchange} value={output}></textarea>
+                <CodeEditor socket={socket} code={code} setCode={setCode} roomId={roomId} lang={currLang} />
+                <Editor 
+                    height="40vh"
+                    width="40vh"
+                    theme="vs-dark"
+                    onChange={onInputChange}
+                    value={input}
+                />
+                <Editor 
+                    height="40vh"
+                    width="40vh"
+                    theme="vs-dark"
+                    onChange={onOutputChange}
+                    value={output}
+                />
+
+                {/* <textarea className="form-control p-3" id="input-file" rows="10" onChange={onInputChange} value={input}></textarea> */}
+                {/* <textarea className="form-control p-3" id="output-file" rows="10" onChange={onOutputChange} value={output}></textarea> */}
 
                 <div className="dropdown">
                     <button className="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
@@ -75,6 +92,7 @@ const Meeting = () => {
                         <li><button className="dropdown-item" name="54" onClick={onclick} type="button">C++</button></li>
                         <li><button className="dropdown-item" name="51" onClick={onclick} type="button">C#</button></li>
                         <li><button className="dropdown-item" name="62" onClick={onclick} type="button">Java</button></li>
+                        <li><button className="dropdown-item" name="63" onClick={onclick} type="button">JavaScript</button></li>
                         <li><button className="dropdown-item" name="71" onClick={onclick} type="button">Python</button></li>
                     </ul>
                 </div>
@@ -82,10 +100,7 @@ const Meeting = () => {
             </div>
 
             <button className='mx-2' onClick={() => { 
-                compile(code, input,lang, setOutput);
-                
-                // Also tell others to compile code or else their Output text area won't change just by socket
-                socket.emit('compile-code', roomId);
+                compile(code, input,lang, onOutputChange);
             }}>Compile Code</button>
 
             <Video />
