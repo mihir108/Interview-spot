@@ -64,6 +64,7 @@ const Meeting = () => {
             } */}
 
             <h2>Code Area</h2>
+            <h5>{roomId}</h5>
             <div className="form-group" style={{ display: 'inline-flex' }}>
                 <CodeEditor socket={socket} code={code} setCode={setCode} roomId={roomId} lang={currLang} />
                 <Editor 

@@ -14,6 +14,8 @@ const io = require('socket.io')(server, {
 var cors = require('cors');
 app.use(cors());
 
+app.use(express.static(path.resolve(__dirname, '../build')));
+
 
 const room = {};
 const users = new Map();
@@ -26,7 +28,7 @@ function addValueToList(key, value) {
 }
 
 io.on("connection", (socket) => {
-
+    
     socket.on("join-room", (roomId) => {
         socket.join(roomId);
         console.log(roomId);
@@ -34,11 +36,11 @@ io.on("connection", (socket) => {
         socket.emit('user-data', room[roomId]);
         addValueToList(roomId,socket.id);
         users.set(socket.id, roomId);
-
+        
         socket.on('disconnect',(err)=>{
             console.log(err);
             socket.broadcast.to(users.get(socket.id)).emit('disconnected', socket.id);
-
+            
             // erase user
             if(room[users.get(socket.id)]){
                 const index = room[users.get(socket.id)].indexOf(socket.id);
@@ -78,9 +80,15 @@ io.on("connection", (socket) => {
     
 });
 
-// const PORT = process.env.PORT || 3000;
 
-const PORT = 5000;
-server.listen(PORT, () => {
-    console.log(`listening on port ${PORT}`);
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../build', 'index.html'));
+});
+
+let port = process.env.PORT;
+if(port == null || port == "") port = 5000;
+// const PORT = 5000;
+
+server.listen(port, () => {
+    console.log(`listening on port ${port}`);
 });

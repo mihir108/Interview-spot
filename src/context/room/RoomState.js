@@ -3,7 +3,15 @@ import { useState, useRef, useEffect } from "react";
 import { io } from 'socket.io-client';
 import Peer from 'simple-peer';
 import { v4 as uuidv4 } from 'uuid';
-const socket = io('http://localhost:5000');
+// const socket = io('http://localhost:5000');
+
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+    // development
+    var socket = io('/')
+} else {
+    // production
+    var socket = io();
+}
 
 
 const RoomState = (props) => {

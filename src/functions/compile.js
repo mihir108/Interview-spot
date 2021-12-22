@@ -1,5 +1,4 @@
 import axios from "axios";
-import { checkResultReturned } from "./checkResultReturned";
 // const API_KEY = '73bfff05e8mshdafc167b1f0cbd0p1f5d74jsn2debc0231dda'
 // const API_KEY = '642a5d1a7fmshfc133c9d3876cc3p14c362jsn159bad2f1041'
 // const API_KEY = '81351fd847msh51e7b8d7c9f13efp1cc954jsn4cce49d4dd1e'
@@ -15,15 +14,6 @@ function decode(bytes) {
 	} catch {
 		return unescape(escaped);
 	}
-}
-
-function showOutput(data, onOutputChange) {
-	let result;
-	if (data.status.description === "Compilation Error") result = data.compile_output;
-	else if (data.status.description === "Accepted") result = data.stdout;
-	else if (data.status.description === 'Runtime Error (NZEC)') result = data.stderr;
-
-	onOutputChange(decode(result));  //  You have to manually tell others that your output file changed programmatically.
 }
 
 function checkIfCodeCompiled(token, onOutputChange) {
