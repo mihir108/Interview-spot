@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
     // development
-    var socket = io('/')
+    var socket = io('https://interview-spot.herokuapp.com/');
 } else {
     // production
     var socket = io();
