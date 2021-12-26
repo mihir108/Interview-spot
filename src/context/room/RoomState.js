@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
     // development
-    var socket = io('https://interview-spot.herokuapp.com/');
+    var socket = io('/');
 } else {
     // production
     var socket = io();
@@ -40,13 +40,13 @@ const RoomState = (props) => {
             socket.once('user-data', (data) => {
                 console.log('got');
                 connectedUsers.current = data;
+                getUserVideoAudio();
             })
             socket.on('disconnected', id => {
                 console.log(id, 'disconnected');
                 users.current.delete(id);
                 showVideos();
             })
-            getUserVideoAudio();
         }
     
     }, [roomId, myID])
@@ -100,7 +100,6 @@ const RoomState = (props) => {
     const receiveConnectionFromNewPeerJoining = (stream, userId) => {
         const peer = new Peer({ initiator: false, trickle: false, stream });
         let destroyed = false;
-
         peer.on('signal', (data) => {
             console.log(userId, 'initialising')
             socket.emit('init-signal', {to:userId, from:myID, data});
@@ -141,7 +140,6 @@ const RoomState = (props) => {
     const sendConnectionToAlreadyPresentPeer = (connectedId, stream) => {
         const peer = new Peer({ initiator: true, trickle: false, stream });
         let destroyed = false;
-        
         peer.on('signal', (data) => {
             console.log(peer);
             socket.emit('init-signal', {to:connectedId ,from:myID, data});
