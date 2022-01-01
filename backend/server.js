@@ -14,7 +14,7 @@ const io = require('socket.io')(server, {
 var cors = require('cors');
 app.use(cors());
 
-app.use(express.static(path.resolve(__dirname, '../build')));
+// app.use(express.static(path.resolve(__dirname, '../build')));
 
 
 const room = {};
@@ -82,8 +82,8 @@ io.on("connection", (socket) => {
 
 
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../build', 'index.html'));
-    // res.send('Backend started');
+    // res.sendFile(path.resolve(__dirname, '../build', 'index.html'));
+    res.send('Backend started');
 });
 
 let port = process.env.PORT;
