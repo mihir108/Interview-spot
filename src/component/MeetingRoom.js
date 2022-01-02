@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 import Video from './Video'
 import { compile } from '../functions/compile';
 import CodeEditor from './CodeEditor';
-import Editor from "@monaco-editor/react";
+import {UnControlled as CodeMirror} from 'react-codemirror2'
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/material.css';
 
 const Meeting = () => {
     const context = useContext(roomContext);
@@ -21,6 +23,7 @@ const Meeting = () => {
             setInput(text);
         });
         socket.on("output-file-change", (text) => {
+            console.log(text, 'output');
             setOutput(text);
         });
         socket.on('lang-change', (newLang) => {
@@ -37,7 +40,8 @@ const Meeting = () => {
         socket.emit(msgName, msg);
     }
     const onOutputChange = (e) => {
-        setOutput(e);
+        console.log(e,'onOutputChange');
+        setOutput(prev => e);
         let msgName = `output-file-change`;
         let msg = { text: e, roomId };
         socket.emit(msgName, msg);
@@ -56,7 +60,7 @@ const Meeting = () => {
         changeLang(e.target.name);
         socket.emit('lang-change', {newLang: e.target.name, roomId});
     }
-
+    
     return (
         <>
             {/* {
@@ -67,23 +71,50 @@ const Meeting = () => {
             <h5>{roomId}</h5>
             <div className="form-group" style={{ display: 'inline-flex' }}>
                 <CodeEditor socket={socket} code={code} setCode={setCode} roomId={roomId} lang={currLang} />
-                <Editor 
+                {/* <Editor 
                     height="40vh"
                     width="40vh"
                     theme="vs-dark"
                     onChange={onInputChange}
                     value={input}
+                /> */}
+                {/* <textarea className="form-control p-3" id="input-file" rows="10" onChange={(e)=>{onInputChange(e.target.value)}} value={input}></textarea> */}
+                <CodeMirror 
+                    options={{
+                        mode: 'xml',
+                        theme: 'material',
+                        lineNumbers: true
+                    }}
+                    // onChange={onOutputChange}
+                    onChange={(editor, data, value) => {
+                        if(data.origin === "+input") onInputChange(value);
+                    }}
+                    value={input}
                 />
-                <Editor 
+
+                {/* <Editor 
                     height="40vh"
-                    width="40vh"
+                    width="100vh"
                     theme="vs-dark"
                     onChange={onOutputChange}
                     value={output}
+                /> */}
+                <CodeMirror 
+                    options={{
+                        mode: 'xml',
+                        theme: 'material',
+                        lineNumbers: true
+                    }}
+                    // onChange={onOutputChange}
+                    onChange={(editor, data, value) => {
+                        //  only run 'onOutputChange' when value is changed manually rather than programmatically
+                        //  data.origin === "+input" only when value is changed manually
+                        if(data.origin === "+input") onOutputChange(value);
+                    }}
+                    value={output}
                 />
 
-                {/* <textarea className="form-control p-3" id="input-file" rows="10" onChange={onInputChange} value={input}></textarea> */}
-                {/* <textarea className="form-control p-3" id="output-file" rows="10" onChange={onOutputChange} value={output}></textarea> */}
+                {/* <textarea className="form-control p-3" id="output-file" rows="10" onChange={(e)=>{onOutputChange(e.target.value)}} value={output}></textarea> */}
 
                 <div className="dropdown">
                     <button className="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">

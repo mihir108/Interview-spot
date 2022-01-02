@@ -37,6 +37,7 @@ function checkIfCodeCompiled(token, onOutputChange) {
 			}, 1000);
 		}
 		else if(description === 'Accepted'){
+			console.log(decode(response.data.stdout), 'Accepted');
 			onOutputChange(decode(response.data.stdout));
 		}
 		else if(description === "Compilation Error"){
